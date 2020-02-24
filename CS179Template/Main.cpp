@@ -11,6 +11,8 @@
 #include <vector>
 
 #include "GLUtils.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "STBimage.h"
 
 // Struct containing vertex info
 struct Vertex
@@ -23,6 +25,9 @@ struct Vertex
 
 	// Vertex Color
 	GLubyte r, g, b, a;
+
+	// UV Coordinates
+	float u, v;
 };
 
 int main()
@@ -66,40 +71,40 @@ int main()
 	Vertex cubeVertices[] =
 	{
 		// Front
-		{ -1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255 },
-		{ 1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255 },
-		{ 1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,	255, 0, 0, 255 },
-		{ -1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255 },
+		{ -1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 0.0f, 0.0f },
+		{ 1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 1.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 1.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 0.0f, 1.0f },
 
 		// Back
-		{ 1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255 },
-		{ -1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255 },
-		{ -1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255 },
-		{ 1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255 },
+		{ 1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 0.0f, 0.0f },
+		{ -1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 1.0f, 0.0f },
+		{ -1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 0.0f, 1.0f },
 
 		// Left
-		{ -1.0f, -1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255 },
-		{ -1.0f, -1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255 },
-		{ -1.0f, 1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255 },
-		{ -1.0f, 1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255 },
+		{ -1.0f, -1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 0.0f, 0.0f },
+		{ -1.0f, -1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 1.0f, 0.0f },
+		{ -1.0f, 1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 1.0f, 1.0f },
+		{ -1.0f, 1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 0.0f, 1.0f },
 
 		// Right
-		{ 1.0f, -1.0f, 1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255 },
-		{ 1.0f, -1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255 },
-		{ 1.0f, 1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255 },
-		{ 1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,	255, 255, 0, 255 },
+		{ 1.0f, -1.0f, 1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 0.0f, 0.0f },
+		{ 1.0f, -1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 1.0f, 0.0f },
+		{ 1.0f, 1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 0.0f, 1.0f },
 
 		// Top
-		{ -1.0f, 1.0f, 1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255 },
-		{ 1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,	255, 0, 255, 255 },
-		{ 1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255 },
-		{ -1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255 },
+		{ -1.0f, 1.0f, 1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 1.0f, 0.0f },
+		{ 1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 1.0f, 1.0f },
+		{ -1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 0.0f, 1.0f },
 
 		// Bottom
-		{ -1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255 },
-		{ 1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255 },
-		{ 1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255 },
-		{ -1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255 }
+		{ -1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 0.0f, 0.0f },
+		{ 1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 1.0f, 0.0f },
+		{ 1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 1.0f, 1.0f },
+		{ -1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 0.0f, 1.0f }
 	};
 
 	// Vertex indices for the cube
@@ -155,9 +160,15 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, nx));
 
+	/*
 	// Vertex color attribute
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, r));
+	*/
+
+	// Vertex UV attribute
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
 
 	// Construct VAO for the light source
 	GLuint lightVao;
@@ -202,6 +213,20 @@ int main()
 	cubePositions.push_back(glm::vec3(1.5f, 2.0f, -2.5f));
 	cubePositions.push_back(glm::vec3(1.5f, 0.2f, -1.5f));
 	cubePositions.push_back(glm::vec3(-1.3f, 1.0f, -1.5f));
+
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex); // bind texture
+
+	int width, height, numChannels; // these will get replaced in stbi_load
+	unsigned char* texData = stbi_load("container-diffuse.png", &width, &height, &numChannels, 0); // read image file
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData); // first rgba is how opengl reads, second is how the actual pic format is
 
 	double prevTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
@@ -326,6 +351,11 @@ int main()
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5f, 0.5f, 0.5f));
 
 			glUniformMatrix4fv(glGetUniformLocation(cubeProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+			glBindTexture(GL_TEXTURE_2D, tex);
+			glActiveTexture(GL_TEXTURE0);
+			glUniform1i(glGetUniformLocation(cubeProgram, "tex"), 0);
+
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		}
 

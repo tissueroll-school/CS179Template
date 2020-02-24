@@ -26,6 +26,9 @@
     <ClInclude Include="GLUtils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="STBimage.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicLighting.vsh">

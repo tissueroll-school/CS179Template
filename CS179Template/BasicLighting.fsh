@@ -2,11 +2,12 @@
 
 in vec3 fragPos;
 in vec3 outNormal;
-in vec4 outColor;
+in vec2 outUV;
 
 out vec4 fragColor;
 
 uniform vec3 eyePos;
+uniform sampler2D tex;
 
 struct Material
 {
@@ -63,6 +64,8 @@ uniform PointLight pointLight;
 uniform SpotLight spotLight;
 
 void main() {
+	fragColor = texture(tex, outUV);
+	return;
 	vec3 normal = normalize(outNormal);
 
 	vec3 viewDir = normalize(eyePos - fragPos);

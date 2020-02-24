@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLUtils.h" />
+    <ClInclude Include="STBimage.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Basic.vsh">

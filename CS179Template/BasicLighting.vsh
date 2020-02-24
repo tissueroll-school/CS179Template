@@ -2,11 +2,11 @@
 
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
-layout(location = 2) in vec4 vertexColor;
+layout(location = 2) in vec2 vertexUV;
 
 out vec3 fragPos;
 out vec3 outNormal;
-out vec4 outColor;
+out vec2 outUV;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -19,5 +19,5 @@ void main() {
 
     outNormal = mat3(transpose(inverse(modelMatrix))) * vertexNormal;
 
-    outColor = vertexColor;
+    outUV = vertexUV;
 }
