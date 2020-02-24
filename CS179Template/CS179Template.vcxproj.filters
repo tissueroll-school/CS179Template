@@ -15,16 +15,32 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\glad\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GLUtils.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
+    <FxCompile Include="BasicLighting.vsh">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CS179Template.cpp">
+    </FxCompile>
+    <FxCompile Include="Basic.vsh">
       <Filter>Source Files</Filter>
-    </ClCompile>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BasicLighting.fsh">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Basic.fsh">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
