@@ -11,9 +11,12 @@
 #include <vector>
 
 #include "GLUtils.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "STBimage.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+
+bool isFirstMouse = true;
 // Struct containing vertex info
 struct Vertex
 {
@@ -23,11 +26,14 @@ struct Vertex
 	// Normal
 	float nx, ny, nz;
 
-	// Vertex Color
-	GLubyte r, g, b, a;
-
-	// UV Coordinates
+	// UV coordinates
 	float u, v;
+};
+
+struct SimpleVertex
+{
+	// position
+	float x, y, z;
 };
 
 int main()
@@ -71,40 +77,79 @@ int main()
 	Vertex cubeVertices[] =
 	{
 		// Front
-		{ -1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 0.0f, 0.0f },
-		{ 1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 1.0f, 1.0f },
-		{ -1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	255, 0, 0, 255, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	0.0f, 0.0f },
+		{ 1.0f, -1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	1.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	0.0f, 1.0f },
 
 		// Back
-		{ 1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 0.0f, 0.0f },
-		{ -1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 1.0f, 0.0f },
-		{ -1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 1.0f, 1.0f },
-		{ 1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0, 255, 0, 255, 0.0f, 1.0f },
+		{ 1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0.0f, 0.0f },
+		{ -1.0f, -1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	1.0f, 0.0f },
+		{ -1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	1.0f, 1.0f },
+		{ 1.0f, 1.0f, -1.0f,	0.0f, 0.0f, -1.0f,	0.0f, 1.0f },
 
 		// Left
-		{ -1.0f, -1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 0.0f, 0.0f },
-		{ -1.0f, -1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 1.0f, 0.0f },
-		{ -1.0f, 1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 1.0f, 1.0f },
-		{ -1.0f, 1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0, 0, 255, 255, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0.0f, 0.0f },
+		{ -1.0f, -1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	1.0f, 0.0f },
+		{ -1.0f, 1.0f, 1.0f,	-1.0f, 0.0f, 0.0f,	1.0f, 1.0f },
+		{ -1.0f, 1.0f, -1.0f,	-1.0f, 0.0f, 0.0f,	0.0f, 1.0f },
 
 		// Right
-		{ 1.0f, -1.0f, 1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 0.0f, 0.0f },
-		{ 1.0f, -1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 1.0f, 1.0f },
-		{ 1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,	255, 255, 0, 255, 0.0f, 1.0f },
+		{ 1.0f, -1.0f, 1.0f,	1.0f, 0.0f, 0.0f,	0.0f, 0.0f },
+		{ 1.0f, -1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	1.0f, 0.0f },
+		{ 1.0f, 1.0f, -1.0f,	1.0f, 0.0f, 0.0f,	1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,	0.0f, 1.0f },
 
 		// Top
-		{ -1.0f, 1.0f, 1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 1.0f, 1.0f },
-		{ -1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	255, 0, 255, 255, 0.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f,	0.0f, 1.0f, 0.0f,	0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,	1.0f, 0.0f },
+		{ 1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	1.0f, 1.0f },
+		{ -1.0f, 1.0f, -1.0f,	0.0f, 1.0f, 0.0f,	0.0f, 1.0f },
 
 		// Bottom
-		{ -1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 0.0f, 0.0f },
-		{ 1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 1.0f, 0.0f },
-		{ 1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 1.0f, 1.0f },
-		{ -1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0, 255, 255, 255, 0.0f, 1.0f }
+		{ -1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	0.0f, 0.0f },
+		{ 1.0f, -1.0f, -1.0f,	0.0f, -1.0f, 0.0f,	1.0f, 0.0f },
+		{ 1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	1.0f, 1.0f },
+		{ -1.0f, -1.0f, 1.0f,	0.0f, -1.0f, 0.0f,	0.0f, 1.0f }
+	};
+
+	SimpleVertex simpleCubeVertices[] =
+	{
+		// Front
+		{ -1.0f, -1.0f, 1.0f},
+		{ 1.0f, -1.0f, 1.0f},
+		{ 1.0f, 1.0f, 1.0f},
+		{ -1.0f, 1.0f, 1.0f},
+
+		// Back
+		{ 1.0f, -1.0f, -1.0f},
+		{ -1.0f, -1.0f, -1.0f},
+		{ -1.0f, 1.0f, -1.0f},
+		{ 1.0f, 1.0f, -1.0f},
+
+		// Left
+		{ -1.0f, -1.0f, -1.0f},
+		{ -1.0f, -1.0f, 1.0f},
+		{ -1.0f, 1.0f, 1.0f},
+		{ -1.0f, 1.0f, -1.0f},
+
+		// Right
+		{ 1.0f, -1.0f, 1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{ 1.0f, 1.0f, -1.0f},
+		{ 1.0f, 1.0f, 1.0f},
+
+		// Top
+		{ -1.0f, 1.0f, 1.0f},
+		{ 1.0f, 1.0f, 1.0f},
+		{ 1.0f, 1.0f, -1.0f},
+		{ -1.0f, 1.0f, -1.0f},
+
+		// Bottom
+		{ -1.0f, -1.0f, -1.0f},
+		{ 1.0f, -1.0f, -1.0f},
+		{ 1.0f, -1.0f, 1.0f},
+		{ -1.0f, -1.0f, 1.0f}
 	};
 
 	// Vertex indices for the cube
@@ -160,15 +205,122 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, nx));
 
-	/*
-	// Vertex color attribute
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, r));
-	*/
-
-	// Vertex UV attribute
+	// UV coordinates attribute
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
+
+	// Create texture handle for the cube's diffuse map
+	GLuint cubeDiffuseTex;
+	glGenTextures(1, &cubeDiffuseTex);
+
+	// Bind our diffuse texture
+	glBindTexture(GL_TEXTURE_2D, cubeDiffuseTex);
+
+	// Set up the parameters for our diffuse texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Read the data for our diffuse map
+	int diffuseWidth, diffuseHeight, diffuseNumChannels;
+	unsigned char* diffuseData = stbi_load("container-diffuse.png", &diffuseWidth, &diffuseHeight, &diffuseNumChannels, 0);
+
+	// Upload the diffuse map data
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseWidth, diffuseHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuseData);
+
+	// Since we already uploaded the diffuse map data to opengl, we don't need it anymore.
+	stbi_image_free(diffuseData);
+	diffuseData = nullptr;
+
+	// Create texture handle for the cube's specular map
+	GLuint cubeSpecularTex;
+	glGenTextures(1, &cubeSpecularTex);
+
+	// Bind our specular texture
+	glBindTexture(GL_TEXTURE_2D, cubeSpecularTex);
+
+	// Set up the parameters for our specular texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Read the data for our specular map
+	int specularWidth, specularHeight, specularNumChannels;
+	unsigned char* specularData = stbi_load("container-specular.png", &specularWidth, &specularHeight, &specularNumChannels, 0);
+
+	// Upload the specular map data
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, specularWidth, specularHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, specularData);
+
+	// Since we already uploaded the specular map data to opengl, we don't need it anymore.
+	stbi_image_free(specularData);
+	specularData = nullptr;
+
+	// skybox
+	// Construct VBO for the cube
+	GLuint skyboxVbo;
+	glGenBuffers(1, &skyboxVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(simpleCubeVertices), simpleCubeVertices, GL_STATIC_DRAW);
+
+	// Construct EBO (Element Buffer Object) for the cube
+	GLuint skyboxEbo;
+	glGenBuffers(1, &skyboxEbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEbo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+
+	// Construct VAO for the cube
+	GLuint skyboxVAO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindVertexArray(skyboxVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEbo);
+
+	// Vertex position attribute
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SimpleVertex), 0);
+
+	/*
+	// Vertex normal attribute
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, nx));
+
+	// UV coordinates attribute
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
+	*/
+
+	GLuint cubeMapTex;
+	glGenTextures(1, &cubeMapTex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTex);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	int width, height, nChannels;
+	unsigned char* data = stbi_load("right.jpg", &width, &height, &nChannels, 0);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_image_free(data);
+	data = stbi_load("left.jpg", &width, &height, &nChannels, 0);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_image_free(data);
+	data = stbi_load("top.jpg", &width, &height, &nChannels, 0);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_image_free(data);
+	data = stbi_load("bottom.jpg", &width, &height, &nChannels, 0);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_image_free(data);
+	data = stbi_load("back.jpg", &width, &height, &nChannels, 0);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_image_free(data);
+	data = stbi_load("front.jpg", &width, &height, &nChannels, 0);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_image_free(data);
 
 	// Construct VAO for the light source
 	GLuint lightVao;
@@ -189,11 +341,13 @@ int main()
 	// Create shader program for the cube
 	GLuint cubeProgram = CreateShaderProgram("BasicLighting.vsh", "BasicLighting.fsh");
 
+	GLuint skyboxProgram = CreateShaderProgram("skybox.vsh", "skybox.fsh");
+
 	// Construct the projection matrix
 	glm::mat4 projMatrix = glm::perspective(glm::radians(45.0f), windowWidth * 1.0f / windowHeight, 0.1f, 100.0f);
 
 	// Camera parameters
-	glm::vec3 eyePosition = glm::vec3(0.0f, 0.0f, 10.0f);
+	glm::vec3 eyePosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	float cameraPitch = 0.0f;
 	float cameraYaw = -90.0f;
 	float movementSpeed = 10.0f; // 10 distance units per second
@@ -213,20 +367,6 @@ int main()
 	cubePositions.push_back(glm::vec3(1.5f, 2.0f, -2.5f));
 	cubePositions.push_back(glm::vec3(1.5f, 0.2f, -1.5f));
 	cubePositions.push_back(glm::vec3(-1.3f, 1.0f, -1.5f));
-
-	GLuint tex;
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex); // bind texture
-
-	int width, height, numChannels; // these will get replaced in stbi_load
-	unsigned char* texData = stbi_load("container-diffuse.png", &width, &height, &numChannels, 0); // read image file
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData); // first rgba is how opengl reads, second is how the actual pic format is
 
 	double prevTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
@@ -296,6 +436,7 @@ int main()
 			eyePosition -= lookDir * movementSpeed * deltaTime;
 		}
 
+		/*
 		// Pass the eye position vector to the current shader that we're using
 		glUniform3f(glGetUniformLocation(cubeProgram, "eyePos"), eyePosition.x, eyePosition.y, eyePosition.z);
 
@@ -327,19 +468,14 @@ int main()
 		glUniform1f(glGetUniformLocation(cubeProgram, "spotLight.kQuadratic"), 0.032f);
 		glUniform1f(glGetUniformLocation(cubeProgram, "spotLight.cutOffAngle"), glm::radians(12.5f));
 
-		// Pass cube material parameters to the shader (bronze material in this case)
-		glUniform3fv(glGetUniformLocation(cubeProgram, "material.ambient"), 1, glm::value_ptr(glm::vec3(0.2125, 0.1275f, 0.054f)));
-		glUniform3fv(glGetUniformLocation(cubeProgram, "material.diffuse"), 1, glm::value_ptr(glm::vec3(0.714f, 0.4284f, 0.18144f)));
-		glUniform3fv(glGetUniformLocation(cubeProgram, "material.specular"), 1, glm::value_ptr(glm::vec3(0.393548f, 0.271906f, 0.166721f)));
-		glUniform1f(glGetUniformLocation(cubeProgram, "material.shininess"), 128 * 0.2f);
-
 		// Pass the projection matrix to the shader
 		glUniformMatrix4fv(glGetUniformLocation(cubeProgram, "projMatrix"), 1, GL_FALSE, glm::value_ptr(projMatrix));
-
+		*/
+		
 		// Construct the view matrix, and pass the view matrix to the shader
 		glm::mat4 viewMatrix = glm::lookAt(eyePosition, eyePosition + lookDir, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(cubeProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
+		/*
 		// Render the cubes
 		for (int i = 0; i < cubePositions.size(); ++i)
 		{
@@ -350,12 +486,23 @@ int main()
 			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f)));
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5f, 0.5f, 0.5f));
 
-			glUniformMatrix4fv(glGetUniformLocation(cubeProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-			glBindTexture(GL_TEXTURE_2D, tex);
+			// Set the active texture unit to 0, and
+			// bind the diffuse map texture to it
 			glActiveTexture(GL_TEXTURE0);
-			glUniform1i(glGetUniformLocation(cubeProgram, "tex"), 0);
+			glBindTexture(GL_TEXTURE_2D, cubeDiffuseTex);
 
+			// Set the active texture unit to 1, and
+			// bind the specular map texture to it
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, cubeSpecularTex);
+
+			// Tell the shader that the diffuse map texture is texture unit 0
+			glUniform1i(glGetUniformLocation(cubeProgram, "diffuseTex"), 0);
+
+			// Tell the shader that the specular map texture is texture unit 1
+			glUniform1i(glGetUniformLocation(cubeProgram, "specularTex"), 1);
+
+			glUniformMatrix4fv(glGetUniformLocation(cubeProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		}
 
@@ -386,6 +533,21 @@ int main()
 
 		// Draw the cube for the light source
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		*/
+		// skybox
+		glUseProgram(skyboxProgram);
+		glBindVertexArray(skyboxVAO);
+
+		// Pass the projection matrix to the shader
+		glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "projMatrix"), 1, GL_FALSE, glm::value_ptr(projMatrix));
+
+		// Pass the view matrix to the shader
+		glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+		glDepthMask(GL_FALSE);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTex);
+		// draw skybox
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDepthMask(GL_TRUE);
 
 		// Swap the front and back buffers
 		glfwSwapBuffers(window);

@@ -7,15 +7,6 @@ in vec2 outUV;
 out vec4 fragColor;
 
 uniform vec3 eyePos;
-uniform sampler2D tex;
-
-struct Material
-{
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float shininess;	
-};
 
 struct DirectionalLight
 {
@@ -55,17 +46,25 @@ struct SpotLight
 	float cutOffAngle;
 };
 
-uniform Material material;
-
 uniform DirectionalLight dirLight;
 
 uniform PointLight pointLight;
 
 uniform SpotLight spotLight;
 
+// Diffuse map
+uniform sampler2D diffuseTex;
+
+// Specular map
+uniform sampler2D specularTex;
+
 void main() {
-	fragColor = texture(tex, outUV);
-	return;
+	// Get the diffuse color from the diffuse map at the given UV coordinates
+	vec3 diffuseColor = texture(diffuseTex, outUV).rgb;
+
+	// Get the specular color from the specular map at the given UV coordinates
+	vec3 specularColor = texture(specularTex, outUV).rgb;
+
 	vec3 normal = normalize(outNormal);
 
 	vec3 viewDir = normalize(eyePos - fragPos);
@@ -75,18 +74,18 @@ void main() {
 	vec3 lightDir = normalize(dirLight.direction);
 	vec3 fragToLightDir = -lightDir;
 
-	vec3 dirLightAmbient = dirLight.ambient * material.ambient;
+	vec3 dirLightAmbient = dirLight.ambient * diffuseColor;
 
 	float dirLightDiffuseCoefficient = max(dot(normal, fragToLightDir), 0.0);
-	vec3 dirLightDiffuse = dirLight.diffuse * (dirLightDiffuseCoefficient * material.diffuse);
+	vec3 dirLightDiffuse = dirLight.diffuse * (dirLightDiffuseCoefficient * diffuseColor);
 
 	vec3 dirLightSpecular = vec3(0.0, 0.0, 0.0);
 	if (dirLightDiffuseCoefficient > 0.0)
 	{
 		vec3 viewDir = normalize(eyePos - fragPos);
 		vec3 reflectDir = reflect(lightDir, normal);
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-		dirLightSpecular = dirLight.specular * (spec * material.specular);
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+		dirLightSpecular = dirLight.specular * (spec * specularColor);
 	}
 
 	vec3 dirLightResult = (dirLightAmbient + dirLightDiffuse + dirLightSpecular);
@@ -96,17 +95,17 @@ void main() {
 	vec3 lightToFragDir = normalize(fragPos - pointLight.position);
 	fragToLightDir = -lightToFragDir;
 
-	vec3 pointLightAmbient = pointLight.ambient * material.ambient;
+	vec3 pointLightAmbient = pointLight.ambient * diffuseColor;
 
 	float pointLightDiffuseCoefficient = max(dot(normal, fragToLightDir), 0.0);
-	vec3 pointLightDiffuse = pointLight.diffuse * (pointLightDiffuseCoefficient * material.diffuse);
+	vec3 pointLightDiffuse = pointLight.diffuse * (pointLightDiffuseCoefficient * diffuseColor);
 
 	vec3 pointLightSpecular = vec3(0.0, 0.0, 0.0);
 	if (pointLightDiffuseCoefficient > 0.0)
 	{
 		vec3 reflectDir = reflect(lightToFragDir, normal);
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-		pointLightSpecular = pointLight.specular * (spec * material.specular);
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+		pointLightSpecular = pointLight.specular * (spec * specularColor);
 	}
 
 	float lightToFragDist = length(fragPos - pointLight.position);
@@ -119,7 +118,7 @@ void main() {
 	lightToFragDir = normalize(fragPos - spotLight.position);
 	fragToLightDir = -lightToFragDir;
 
-	vec3 spotLightAmbient = spotLight.ambient * material.ambient;
+	vec3 spotLightAmbient = spotLight.ambient * diffuseColor;
 
 	vec3 spotLightDiffuse = vec3(0.0, 0.0, 0.0);
 	vec3 spotLightSpecular = vec3(0.0, 0.0, 0.0);
@@ -129,13 +128,13 @@ void main() {
 	if (cosTheta > cosPhi)
 	{
 		float spotLightDiffuseCoefficient = max(dot(normal, fragToLightDir), 0.0);
-		spotLightDiffuse = spotLight.diffuse * (spotLightDiffuseCoefficient * material.diffuse);
+		spotLightDiffuse = spotLight.diffuse * (spotLightDiffuseCoefficient * diffuseColor);
 
 		if (spotLightDiffuseCoefficient > 0.0)
 		{
 			vec3 reflectDir = reflect(lightToFragDir, normal);
-			float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-			spotLightSpecular = spotLight.specular * (spec * material.specular);
+			float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+			spotLightSpecular = spotLight.specular * (spec * specularColor);
 		}
 	}
 
