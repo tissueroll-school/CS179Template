@@ -350,7 +350,7 @@ int main()
 	glm::vec3 eyePosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	float cameraPitch = 0.0f;
 	float cameraYaw = -90.0f;
-	float movementSpeed = 10.0f; // 10 distance units per second
+	float movementSpeed = 10.0f/2.0f; // 10 distance units per second
 	float lookSpeed = 45.0f; // 45 degrees per second
 
 	// Light-related parameters
@@ -474,6 +474,7 @@ int main()
 		
 		// Construct the view matrix, and pass the view matrix to the shader
 		glm::mat4 viewMatrix = glm::lookAt(eyePosition, eyePosition + lookDir, glm::vec3(0.0f, 1.0f, 0.0f));
+		viewMatrix = glm::mat4(glm::mat3(viewMatrix));
 		glUniformMatrix4fv(glGetUniformLocation(cubeProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 		/*
 		// Render the cubes
